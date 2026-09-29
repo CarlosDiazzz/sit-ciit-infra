@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sit-ciit.local/contracts/contract.schema.json",
+  "title": "SIT-CIIT message contract",
+  "description": "Contrato de mensajes MQTT v1.0.0. Fuente de verdad: sit-ciit-infra/contracts/. Ver contract.ts para los tipos TypeScript equivalentes.",
+  "$defs": {
+    "vector3": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+    "gpsCoords": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lon": { "type": "number", "minimum": -180, "maximum": 180 }
+      }
+    },
+    "gpsReading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+        "speedMs": { "type": "number", "minimum": 0 },
+        "accuracyM": { "type": "number", "minimum": 0 }
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "required": ["contractVersion", "msgId", "nodeId", "unitId", "role", "seq", "ts", "type"],
+      "properties": {
+        "contractVersion": { "type": "string", "const": "1.0.0" },
+        "msgId": { "type": "string", "format": "uuid" },
+        "nodeId": { "type": "string", "minLength": 1 },
+        "unitId": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "enum": ["primary", "backup"] },
+        "seq": { "type": "integer", "minimum": 0 },
+        "ts": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string", "enum": ["telemetry", "event", "heartbeat", "ack"] }
+      }
+    },
+    "telemetryMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/envelope" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "telemetry" },
+            "accel": { "$ref": "#/$defs/vector3" },
+            "gyro": { "$ref": "#/$defs/vector3" },
+            "lux": { "type": "number" },
+            "pressureHpa": { "type": "number" },
+            "gps": { "$ref": "#/$defs/gpsReading" }
+          }
+        }
+      ]
+    },
+    "eventMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/envelope" },
+        {
+          "type": "object",
+          "required": ["kind", "severity"],
+          "properties": {
+            "type": { "const": "event" },
+            "kind": {
+              "type": "string",
+              "enum": ["impact", "door_open", "door_closed", "rollover", "threshold_exceeded"]
+            },
+            "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
+            "value": { "type": "number" },
+            "threshold": { "type": "number" },
+            "gps": { "$ref": "#/$defs/gpsCoords" }
+          }
+        }
+      ]
+    },
+    "heartbeatMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/envelope" },
+        {
+          "type": "object",
+          "required": ["pendingOutbox", "samplingMs", "capabilities", "mode"],
+          "properties": {
+            "type": { "const": "heartbeat" },
+            "batteryPct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "pendingOutbox": { "type": "integer", "minimum": 0 },
+            "samplingMs": { "type": "integer", "minimum": 1 },
+            "capabilities": { "type": "array", "items": { "type": "string" } },
+            "mode": { "type": "string", "enum": ["normal", "inspection", "alarm"] }
+          }
+        }
+      ]
+    },
+    "ackMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/envelope" },
+        {
+          "type": "object",
+          "required": ["cmdId", "status"],
+          "properties": {
+            "type": { "const": "ack" },
+            "cmdId": { "type": "string", "format": "uuid" },
+            "status": { "type": "string", "enum": ["delivered", "executed", "rejected"] },
+            "reason": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "cmdMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractVersion", "cmdId", "targetNodeId", "issuedBy", "action", "params", "issuedAt"],
+      "properties": {
+        "contractVersion": { "type": "string", "const": "1.0.0" },
+        "cmdId": { "type": "string", "format": "uuid" },
+        "targetNodeId": { "type": "string", "minLength": 1 },
+        "issuedBy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["userId", "role"],
+          "properties": {
+            "userId": { "type": "string", "minLength": 1 },
+            "role": { "type": "string", "enum": ["control_center", "operator"] }
+          }
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "set_sampling_rate",
+            "set_thresholds",
+            "trigger_alarm",
+            "stop_alarm",
+            "set_mode",
+            "toggle_sensor"
+          ]
+        },
+        "params": { "type": "object" },
+        "issuedAt": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/telemetryMessage" },
+    { "$ref": "#/$defs/eventMessage" },
+    { "$ref": "#/$defs/heartbeatMessage" },
+    { "$ref": "#/$defs/ackMessage" },
+    { "$ref": "#/$defs/cmdMessage" }
+  ]
+}

@@ -1,0 +1,6 @@
+.env
+node_modules/
+mosquitto/config/passwd
+mosquitto-data/
+data/*.geojson
+*.log
