@@ -1,8 +1,8 @@
-// SIT-CIIT — Contrato de mensajes v1.0.0
+// SIT-CIIT — Contrato de mensajes v1.1.0
 // Fuente de verdad. NO editar copias en otros repos: usar scripts/sync-contract.sh
 // desde sit-ciit-infra para propagar cambios.
 
-export const CONTRACT_VERSION = "1.0.0";
+export const CONTRACT_VERSION = "1.1.0";
 
 // ---------------------------------------------------------------------------
 // Tipos compartidos
@@ -52,6 +52,10 @@ export interface TelemetryPayload {
   accel?: Vector3;
   /** rad/s */
   gyro?: Vector3;
+  /** microtesla (µT), lectura cruda — no es rumbo/brújula. Calcular
+   *  rumbo requiere compensar inclinación con el acelerómetro y
+   *  calibración; queda fuera del MVP (ver roadmap). */
+  mag?: Vector3;
   lux?: number;
   pressureHpa?: number;
   gps?: GpsReading;
