@@ -36,13 +36,14 @@
     },
     "envelope": {
       "type": "object",
-      "required": ["contractVersion", "msgId", "nodeId", "unitId", "role", "seq", "ts", "type"],
+      "required": ["contractVersion", "msgId", "nodeId", "unitId", "role", "nodeSecret", "seq", "ts", "type"],
       "properties": {
         "contractVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
         "msgId": { "type": "string", "format": "uuid" },
         "nodeId": { "type": "string", "minLength": 1 },
         "unitId": { "type": "string", "minLength": 1 },
         "role": { "type": "string", "enum": ["primary", "backup"] },
+        "nodeSecret": { "type": "string", "minLength": 1 },
         "seq": { "type": "integer", "minimum": 0 },
         "ts": { "type": "integer", "minimum": 0 },
         "type": { "type": "string", "enum": ["telemetry", "event", "heartbeat", "ack"] }

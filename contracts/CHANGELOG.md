@@ -3,6 +3,23 @@
 Versionado semántico. Cualquier cambio a `contract.schema.json` o `contract.ts`
 debe reflejarse aquí y en el campo `contractVersion` de ambos archivos.
 
+## [1.3.0] - 2026-09-30
+
+- `Envelope.nodeSecret: string` — **campo obligatorio, cambio que rompe
+  compatibilidad a propósito**. Antes cualquier celular podía declararse
+  dueño de cualquier `nodeId` con solo escribirlo en la app; ahora cada
+  nodo se da de alta explícitamente (CRUD de Nodos, rol `control_center`),
+  que emite un secreto una sola vez. El backend lo verifica contra un
+  hash guardado antes de aceptar telemetry/event/heartbeat/ack — sin él
+  (o con uno incorrecto) el mensaje se descarta.
+- Efecto práctico: un nodo que hable 1.2.0 o anterior **deja de
+  funcionar** hasta que se re-provisione con un secreto real — no es
+  compatible como los bumps anteriores. Con solo un celular de prueba
+  real en este momento, el costo de re-provisionarlo es mínimo.
+- La conexión al broker MQTT sigue igual (credencial compartida): esto
+  verifica identidad del nodo a nivel mensaje, no cambia nada de
+  Mosquitto.
+
 ## [1.2.0] - 2026-09-30
 
 - `EventKind` suma cuatro eventos de dinámica de marcha, detectados en el
