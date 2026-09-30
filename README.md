@@ -83,5 +83,7 @@ Cuando el contrato cambia:
 - `docs/architecture.md` — diagrama de arquitectura (Mermaid).
 - `docs/adr/` — decisiones técnicas cortas (ADR).
 - `docs/demo-script.md` — guion de la demo final (criterio de aceptación).
+- `docs/despliegue-y-escalabilidad.md` — costos de despliegue, volumen de
+  datos medido y qué cambiar para escalar.
 - `docs/flujo-de-trabajo.md` — cómo trabajamos en los cuatro repos: una
   rama por persona, `main` siempre integrable, integrar seguido.
