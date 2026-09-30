@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sit-ciit.local/contracts/contract.schema.json",
   "title": "SIT-CIIT message contract",
-  "description": "Contrato de mensajes MQTT v1.1.0. Fuente de verdad: sit-ciit-infra/contracts/. Ver contract.ts para los tipos TypeScript equivalentes.",
+  "description": "Contrato de mensajes MQTT v1.2.0. Fuente de verdad: sit-ciit-infra/contracts/. Ver contract.ts para los tipos TypeScript equivalentes.",
   "$defs": {
     "vector3": {
       "type": "object",
@@ -75,7 +75,7 @@
             "type": { "const": "event" },
             "kind": {
               "type": "string",
-              "enum": ["impact", "door_open", "door_closed", "rollover", "threshold_exceeded"]
+              "enum": ["impact", "door_open", "door_closed", "rollover", "threshold_exceeded", "hard_brake", "curve_overspeed", "dynamic_impact", "track_irregularity"]
             },
             "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
             "value": { "type": "number" },
