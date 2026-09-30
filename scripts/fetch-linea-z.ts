@@ -57,10 +57,16 @@ async function main() {
   console.log("Consultando Overpass API...");
   console.log(QUERY);
 
+  // Overpass rechaza con 406 a los clientes que no se identifican: su
+  // politica de uso pide un User-Agent con el nombre del proyecto. El
+  // cuerpo va como formulario (data=...), que es lo que espera la API.
   const res = await fetch(OVERPASS_URL, {
     method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: QUERY,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "sit-ciit/1.0 (proyecto academico; Corredor Interoceanico)",
+    },
+    body: new URLSearchParams({ data: QUERY }).toString(),
   });
 
   if (!res.ok) {
